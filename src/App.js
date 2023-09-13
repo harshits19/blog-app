@@ -1,8 +1,11 @@
+import AddPostForm from "./Features/Posts/AddPostForm";
+import PostsList from "./Features/Posts/PostsList";
 function App() {
   return (
-    <div className="">
-      <h1>Hello World</h1>
-    </div>
+    <main className="App">
+      <AddPostForm />
+      <PostsList />
+    </main>
   );
 }
 
