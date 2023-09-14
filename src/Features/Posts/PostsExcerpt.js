@@ -2,7 +2,11 @@ import PostAuthor from "./PostAuthor";
 import TimeAgo from "./TimeAgo";
 import ReactionButtons from "./ReactionButtons";
 import { Link } from "react-router-dom";
-const PostsExcerpt = ({ post }) => {
+import { useSelector } from "react-redux";
+import { getPostById } from "./postsSlice";
+
+const PostsExcerpt = ({ postId }) => {
+  const post = useSelector((store) => getPostById(store, postId));
   return (
     <article>
       <h2>{post.title.substring(0, 50)}...</h2>
