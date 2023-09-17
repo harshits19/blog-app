@@ -6,25 +6,18 @@ import {
 } from "@reduxjs/toolkit";
 import sub from "date-fns/sub";
 import axios from "axios";
-const POST_URL = "https://jsonplaceholder.typicode.com/posts";
 const FETCH_URL = "https://jsonplaceholder.typicode.com/posts";
 
 const postAdaptor = createEntityAdapter({
   sortComparer: (a, b) => b.date.localeCompare(a.date),
 });
-/* 
-const initialState = {
-  posts: [],
-  status: "idle", //'idle' | 'pending' | 'succeeded' | 'failed'
-  error: null,
-}; */
 const initialState = postAdaptor.getInitialState({
   status: "idle",
   error: null,
 });
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
-  const res = await axios.get(POST_URL);
+  const res = await axios.get(FETCH_URL);
   return res.data;
 });
 
@@ -43,7 +36,7 @@ export const updatePost = createAsyncThunk(
       const response = await axios.put(`${FETCH_URL}/${id}`, initialPost);
       return response.data;
     } catch (err) {
-      return initialPost; // only for testing Redux!
+      return initialPost;
     }
   }
 );
@@ -94,16 +87,9 @@ const postsSlice = createSlice({
           };
           return post;
         });
-        // state.posts = [...loadedPosts];
         postAdaptor.upsertMany(state, loadedPosts);
       })
       .addCase(addNewPost.fulfilled, (state, action) => {
-        // const sortedPosts = state.posts.sort((a, b) => {
-        //   if (a.id > b.id) return 1;
-        //   if (a.id < b.id) return -1;
-        //   return 0;
-        // });
-        // action.payload.id = sortedPosts[sortedPosts.length - 1].id + 1;
         action.payload.userId = Number(action.payload.userId);
         action.payload.date = new Date().toISOString();
         action.payload.reactions = {
@@ -113,7 +99,6 @@ const postsSlice = createSlice({
           rocket: 0,
           coffee: 0,
         };
-        // state.posts.push(action.payload);
         postAdaptor.addOne(state, action.payload);
       })
       .addCase(updatePost.fulfilled, (state, action) => {
@@ -122,10 +107,7 @@ const postsSlice = createSlice({
           console.log(action.payload);
           return;
         }
-        // const { id } = action.payload;
         action.payload.date = new Date().toISOString();
-        // const posts = state.posts.filter((post) => post.id !== id);
-        // state.posts = [...posts, action.payload];
         postAdaptor.upsertOne(state, action.payload);
       })
       .addCase(deletePost.fulfilled, (state, action) => {
@@ -135,16 +117,10 @@ const postsSlice = createSlice({
           return;
         }
         const { id } = action.payload;
-        // const posts = state.posts.filter((post) => post.id !== id);
-        // state.posts = posts;
         postAdaptor.removeOne(state, id);
       });
   },
 });
-
-// export const selectAllPosts = (store) => store.posts.posts;
-// export const getPostById = (store, postId) =>
-//   store.posts.posts.find((post) => post.id === postId);
 
 export const {
   selectAll: selectAllPosts,
